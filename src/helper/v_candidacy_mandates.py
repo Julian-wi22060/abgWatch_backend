@@ -27,13 +27,6 @@ def get_v_candidacy_mandates():
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT 
-                    candidacy_mandate_id,
-                    parliament_id,
-                    parliament_name_short,
-                    parliament_name_long,
-                    parliament_period_id,
-                    start_date_period,
-                    end_date_period,
                     politician_id,
                     politician_first_name,
                     politician_last_name,
@@ -41,7 +34,13 @@ def get_v_candidacy_mandates():
                     politician_year_of_birth,
                     politician_education,
                     party_id,
-                    politician_party_name
+                    politician_party_name,
+                    parliament_id,
+                    parliament_name_short,
+                    parliament_name_long,
+                    parliament_period_id,
+                    start_date_period,
+                    end_date_period
                 FROM mart.v_candidacy_mandates;
             """)
             rows = cur.fetchall()
