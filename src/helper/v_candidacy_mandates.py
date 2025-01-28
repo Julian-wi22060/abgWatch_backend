@@ -11,7 +11,7 @@ def custom_json_serializer(obj):
     Custom serializer function for handling non-serializable objects like dates.
     """
     if isinstance(obj, (date, datetime)):
-        return obj.isoformat()  # Konvertiert zu ISO-8601-String (z.B. "2023-01-01")
+        return obj.isoformat()
     raise TypeError(f"Type {type(obj)} not serializable")
 
 @v_cm_bp.route("/", methods=["GET"])
