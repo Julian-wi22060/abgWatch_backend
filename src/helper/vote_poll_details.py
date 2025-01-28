@@ -32,7 +32,8 @@ def get_vote_poll_details():
                         poll_id,
                         vote_state,
                         COUNT(*) AS state_count,
-                        MIN(field_poll_date) AS poll_date
+                        MIN(field_poll_date) AS poll_date,
+                        MIN(poll_description)
                     FROM mart.vote_poll_details
                     GROUP BY poll_id, vote_state
                     ORDER BY poll_id, vote_state;
@@ -46,9 +47,10 @@ def get_vote_poll_details():
                     vote_state = row[1]
                     state_count = row[2]
                     poll_date = row[3]
+                    poll_description = row[4]
 
                     if poll_id not in data:
-                        data[poll_id] = {"poll_date": poll_date, "vote_states": {}}
+                        data[poll_id] = {"poll_date": poll_date, "vote_states": {}, "poll_description": poll_description}
                     data[poll_id]["vote_states"][vote_state] = state_count
             else:
                 # Default query without grouping, includes vote_state directly
