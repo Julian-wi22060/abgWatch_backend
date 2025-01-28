@@ -37,3 +37,10 @@ if __name__ == "__main__":
     """
     app = create_app()
     app.run(host="0.0.0.0", port=50555, debug=True)
+
+
+# ACCESS APIs VIA:
+# http://127.0.0.1:50555/v_candidacy_mandates/?grouped=1
+# http://127.0.0.1:50555/v_candidacy_mandates
+# http://127.0.0.1:50555/v_candidacy_mandates/?grouped=1
+# http://127.0.0.1:50555/vote_poll_details
