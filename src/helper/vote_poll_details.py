@@ -69,7 +69,7 @@ def get_vote_poll_details():
 
     except Exception as e:
         return Response(
-            json.dumps({"error": str(e)}, ensure_ascii=False, indent=4, sort_keys=True),
+            json.dumps({"error": str(e)}, ensure_ascii=False, indent=1, sort_keys=True),
             status=500,
             mimetype="application/json; charset=utf-8"
         )
@@ -79,6 +79,6 @@ def get_vote_poll_details():
 
     # Use json.dumps with ensure_ascii=False, indent, and sort_keys for formatting
     return Response(
-        json.dumps(data, ensure_ascii=False, indent=4, sort_keys=True, default=custom_json_serializer),
+        json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True, default=custom_json_serializer),
         mimetype="application/json; charset=utf-8"
     )

@@ -72,7 +72,7 @@ def get_v_candidacy_mandates():
 
     except Exception as e:
         return Response(
-            json.dumps({"error": str(e)}, ensure_ascii=False, indent=4, sort_keys=True),
+            json.dumps({"error": str(e)}, ensure_ascii=False, indent=1, sort_keys=True),
             status=500,
             mimetype="application/json; charset=utf-8"
         )
@@ -82,6 +82,6 @@ def get_v_candidacy_mandates():
 
     # Serialize data using the custom JSON serializer
     return Response(
-        json.dumps(data, ensure_ascii=False, indent=4, sort_keys=True, default=custom_json_serializer),
+        json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True, default=custom_json_serializer),
         mimetype="application/json; charset=utf-8"
     )
