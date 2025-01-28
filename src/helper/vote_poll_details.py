@@ -1,23 +1,23 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, request
 from helper.db_connection import get_db_connection
+import json
+from datetime import date, datetime
 
 # Set blueprint for 'VIEW vote_poll_details'
 vote_poll = Blueprint("vote_poll_details", __name__)
+
+def custom_json_serializer(obj):
+    """
+    Custom serializer function for handling non-serializable objects like dates.
+    """
+    if isinstance(obj, (date, datetime)):
+        return obj.isoformat()  # Konvertiert zu ISO-8601-String (z.B. "2023-01-01")
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 @vote_poll.route("/", methods=["GET"])
 def get_vote_poll_details():
     """
     Retrieves data from the 'mart.vote_poll_details' view with optional grouping by poll_id.
-    Parameters:
-        - grouped: Query parameter to specify grouping (0 = not grouped, 1 = grouped).
-    Workflow:
-        1. Read 'grouped' parameter from the query string.
-        2. Dynamically adjust the SQL query based on the parameter.
-        3. Execute the SQL query and fetch results.
-        4. Return the results as JSON.
-    Returns:
-        - JSON array of objects on success.
-        - JSON error response on failure.
     """
     grouped = request.args.get("grouped", "0")
     conn = None
@@ -26,17 +26,32 @@ def get_vote_poll_details():
         conn = get_db_connection()
         with conn.cursor() as cur:
             if grouped == "1":
-                # Query with grouping by poll_id
+                # Query to group by poll_id, count vote_state occurrences, and include poll_date
                 cur.execute("""
                     SELECT 
                         poll_id,
-                        COUNT(*) AS total_votes,
-                        MIN(field_poll_date)
+                        vote_state,
+                        COUNT(*) AS state_count,
+                        MIN(field_poll_date) AS poll_date
                     FROM mart.vote_poll_details
-                    GROUP BY poll_id;
+                    GROUP BY poll_id, vote_state
+                    ORDER BY poll_id, vote_state;
                 """)
+                rows = cur.fetchall()
+
+                # Restructure results into a dictionary with poll_id as the key
+                data = {}
+                for row in rows:
+                    poll_id = row[0]
+                    vote_state = row[1]
+                    state_count = row[2]
+                    poll_date = row[3]
+
+                    if poll_id not in data:
+                        data[poll_id] = {"poll_date": poll_date, "vote_states": {}}
+                    data[poll_id]["vote_states"][vote_state] = state_count
             else:
-                # Default query without grouping
+                # Default query without grouping, includes vote_state directly
                 cur.execute("""
                     SELECT 
                         vote_id,
@@ -45,14 +60,25 @@ def get_vote_poll_details():
                         poll_id,
                         field_poll_date,
                         poll_description
-                    FROM mart.vote_poll_details;
+                    FROM mart.vote_poll_details
+                    ORDER BY field_poll_date ASC;
                 """)
+                columns = [desc[0] for desc in cur.description]
+                rows = [dict(zip(columns, row)) for row in cur.fetchall()]
+                data = {row['vote_id']: row for row in rows}
 
-            rows = cur.fetchall()
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return Response(
+            json.dumps({"error": str(e)}, ensure_ascii=False, indent=4, sort_keys=True),
+            status=500,
+            mimetype="application/json; charset=utf-8"
+        )
     finally:
         if conn is not None:
             conn.close()
 
-    return jsonify(rows)
+    # Use json.dumps with ensure_ascii=False, indent, and sort_keys for formatting
+    return Response(
+        json.dumps(data, ensure_ascii=False, indent=4, sort_keys=True, default=custom_json_serializer),
+        mimetype="application/json; charset=utf-8"
+    )

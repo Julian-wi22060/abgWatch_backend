@@ -1,24 +1,23 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, request
 from helper.db_connection import get_db_connection
+import json
+from datetime import date, datetime
 
 # Set blueprint for 'VIEW v_candidacy_mandates'
 v_cm_bp = Blueprint("v_candidacy_mandates", __name__)
 
+def custom_json_serializer(obj):
+    """
+    Custom serializer function for handling non-serializable objects like dates.
+    """
+    if isinstance(obj, (date, datetime)):
+        return obj.isoformat()  # Konvertiert zu ISO-8601-String (z.B. "2023-01-01")
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 @v_cm_bp.route("/", methods=["GET"])
 def get_v_candidacy_mandates():
     """
     Retrieves data from the 'mart.v_candidacy_mandates' view with optional grouping by party.
-    Parameters:
-        - grouped: Query parameter to specify grouping (0 = not grouped, 1 = grouped).
-    Workflow:
-        1. Read 'grouped' parameter from the query string.
-        2. Dynamically adjust the SQL query based on the parameter.
-        3. Execute the SQL query and fetch results.
-        4. Return the results as JSON.
-    Returns:
-        - JSON array of objects on success.
-        - JSON error response on failure.
     """
     grouped = request.args.get("grouped", "0")
     conn = None
@@ -36,6 +35,15 @@ def get_v_candidacy_mandates():
                     FROM mart.v_candidacy_mandates
                     GROUP BY party_id, politician_party_name;
                 """)
+                rows = cur.fetchall()
+
+                # Restructure results into a dictionary with party_id as key
+                data = {
+                    row[0]: {
+                        "party_name": row[1],
+                        "total_mandates": row[2]
+                    } for row in rows
+                }
             else:
                 # Default query without grouping
                 cur.execute("""
@@ -56,12 +64,24 @@ def get_v_candidacy_mandates():
                         end_date_period
                     FROM mart.v_candidacy_mandates;
                 """)
+                rows = cur.fetchall()
+                columns = [desc[0] for desc in cur.description]
+                data = {
+                    row[0]: dict(zip(columns, row)) for row in rows
+                }
 
-            rows = cur.fetchall()
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return Response(
+            json.dumps({"error": str(e)}, ensure_ascii=False, indent=4, sort_keys=True),
+            status=500,
+            mimetype="application/json; charset=utf-8"
+        )
     finally:
         if conn is not None:
             conn.close()
 
-    return jsonify(rows)
+    # Serialize data using the custom JSON serializer
+    return Response(
+        json.dumps(data, ensure_ascii=False, indent=4, sort_keys=True, default=custom_json_serializer),
+        mimetype="application/json; charset=utf-8"
+    )
