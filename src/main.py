@@ -40,8 +40,11 @@ if __name__ == "__main__":
 
 
 # ACCESS APIs VIA:
+# V_CANDIDACY_MANDATES API:
 # http://127.0.0.1:50555/v_candidacy_mandates/?grouped=1    # GROUPED BY PARTY
 # http://127.0.0.1:50555/v_candidacy_mandates               # ALL CANDIDACY MANDATES
+
+# VOTE_POLL_DETAILS API:
 # http://127.0.0.1:50555/vote_poll_details/?grouped=1       # GROUPED BY POLL_ID
 # http://127.0.0.1:50555/vote_poll_details/?grouped=2       # GROUPED BY POLL_ID W/O POLL_DESCRIPTION
 # http://127.0.0.1:50555/vote_poll_details                  # ALL POLLS (NOT RECOMMENDED DUE TO LONG FETCH TIME)
