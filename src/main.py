@@ -1,5 +1,6 @@
 from flask import Flask
 from helper.v_candidacy_mandates import v_cm_bp
+from helper.vote_poll_details import vote_poll
 
 
 def create_app():
@@ -15,6 +16,7 @@ def create_app():
 
     # Register blueprints for each API
     app.register_blueprint(v_cm_bp, url_prefix="/v_candidacy_mandates")
+    app.register_blueprint(vote_poll, url_prefix="/vote_poll_details")
 
     # Health-endpoint
     @app.route("/health")
