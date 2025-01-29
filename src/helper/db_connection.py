@@ -18,17 +18,3 @@ def get_db_connection():
         password=os.getenv('POSTGRES_PASSWORD')
     )
     return conn
-
-
-'''
-# TEST FOR LOCAL RUN: Hardcode environment variables for connecting to the db
-def get_db_connection():
-    conn = psycopg2.connect(
-        host='localhost',
-        port=50444,
-        dbname='DIP',
-        user='AbgWatch_admin',
-        password='adafg-trastr-8090'
-    )
-    return conn
-'''
