@@ -26,7 +26,7 @@ def get_vote_poll_details():
         conn = get_db_connection()
         with conn.cursor() as cur:
             if grouped == "1":
-                # Query to group by poll_id, count vote_state occurrences, and include poll_date
+                # Query to group by poll_id, count vote_state occurrences, include poll_date and poll_description
                 cur.execute("""
                     SELECT 
                         poll_id,
@@ -54,7 +54,7 @@ def get_vote_poll_details():
                     data[poll_id]["vote_states"][vote_state] = state_count
 
             elif grouped == "2":
-                # Query to group by poll_id, count vote_state occurrences, and include poll_date
+                # Query to group by poll_id, count vote_state occurrences and include poll_date
                 cur.execute("""
                     SELECT 
                         poll_id,
