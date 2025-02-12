@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from helper.v_candidacy_mandates import v_cm_bp
 from helper.vote_poll_details import vote_poll
 
@@ -13,6 +14,7 @@ def create_app():
         Flask: The configured Flask application instance.
     """
     app = Flask(__name__)
+    CORS(app)
 
     # Register blueprints for each API
     app.register_blueprint(v_cm_bp, url_prefix="/v_candidacy_mandates")
