@@ -17,7 +17,7 @@ def custom_json_serializer(obj):
 @v_cm_bp.route("/", methods=["GET"])
 def get_v_candidacy_mandates():
     """
-    Retrieves data from the 'mart.v_candidacy_mandates' view with optional grouping by party.
+    Retrieves data from the 'mart.v_candidacy_mandates' view with optional grouping by party or politician_party_name.
     """
     grouped = request.args.get("grouped", "0")
     conn = None
@@ -44,6 +44,42 @@ def get_v_candidacy_mandates():
                         "total_mandates": row[2]
                     } for row in rows
                 }
+            elif grouped == "2":
+                # Query grouping by politician_party_name
+                cur.execute("""
+                                SELECT 
+                                    politician_id,
+                                    politician_first_name,
+                                    politician_last_name,
+                                    politician_sex,
+                                    politician_year_of_birth,
+                                    politician_education,
+                                    party_id,
+                                    politician_party_name,
+                                    parliament_id,
+                                    parliament_name_short,
+                                    parliament_name_long,
+                                    parliament_period_id,
+                                    start_date_period,
+                                    end_date_period
+                                FROM mart.v_candidacy_mandates;
+                            """)
+                rows = cur.fetchall()
+                columns = [desc[0] for desc in cur.description]
+
+                data = {}
+                for row in rows:
+                    row_dict = dict(zip(columns, row))
+                    party_name = row_dict.pop("politician_party_name")
+                    party_id = row_dict["party_id"]
+
+                    if party_name not in data:
+                        data[party_name] = {
+                            "party_id": party_id,
+                            "politicians": {}
+                        }
+
+                    data[party_name]["politicians"][row_dict["politician_id"]] = row_dict
             else:
                 # Default query without grouping
                 cur.execute("""
