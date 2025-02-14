@@ -1,35 +1,56 @@
+import os
 import unittest
-import requests
+from main import create_app
 
-BASE_URL = "http://localhost:50555"
+os.environ["DB_HOST"] = "localhost"
+os.environ["DB_PORT"] = "50444"
+os.environ["POSTGRES_USER"] = "AbgWatch_admin"
+os.environ["POSTGRES_PASSWORD"] = "adafg-trastr-8090"
+os.environ["POSTGRES_DB"] = "DIP"
 
-
-class TestAPIEndpoints(unittest.TestCase):
-    # --------------------
-    # v_candidacy_mandates
-    # --------------------
-    def test_get_v_candidacy_mandates_list(self):
-        """Tests GET /v_candidacy_mandates/"""
-        r = requests.get(f"{BASE_URL}/v_candidacy_mandates/")
-        self.assertEqual(r.status_code, 200)
-
-        data = r.json()
-        print("uccess: v_candidacy_mandates data snippet:", data[:2])
-
-    def test_get_v_candidacy_mandates_by_id(self):
-        """Tests GET /v_candidacy_mandates/<id>"""
-        cm_id = 1
-        r = requests.get(f"{BASE_URL}/v_candidacy_mandates/{cm_id}")
-        if r.status_code == 404:
-            print(f"Kein Eintrag in v_candidacy_mandates für ID={cm_id}. Test wird übersprungen.")
-            self.skipTest(f"No entry found with ID={cm_id}")
-        else:
-            self.assertEqual(r.status_code, 200)
-            data = r.json()
-            print("uccess: Einzel-v_candidacy_mandates snippet:", data)
+app = create_app()
 
 
-if __name__ == "__main__":
+class BackendTestCase(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        """Einmalige Einrichtung für die Tests"""
+        cls.client = app.test_client()
+        cls.client.testing = True
+
+    def test_get_v_candidacy_mandates_all(self):
+        """Test für den Endpunkt /v_candidacy_mandates/"""
+        response = self.client.get('/v_candidacy_mandates/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_v_candidacy_mandates_grouped_1(self):
+        """Test für den Endpunkt /v_candidacy_mandates/?grouped=1"""
+        response = self.client.get('/v_candidacy_mandates/?grouped=1')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_v_candidacy_mandates_grouped_2(self):
+        """Test für den Endpunkt /v_candidacy_mandates/?grouped=2"""
+        response = self.client.get('/v_candidacy_mandates/?grouped=2')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_vote_poll_details_all(self):
+        """Test für den Endpunkt /vote_poll_details/"""
+        response = self.client.get('/vote_poll_details/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_vote_poll_details_grouped_1(self):
+        """Test für den Endpunkt /vote_poll_details/?grouped=1"""
+        response = self.client.get('/vote_poll_details/?grouped=1')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_vote_poll_details_grouped_2(self):
+        """Test für den Endpunkt /vote_poll_details/?grouped=2"""
+        response = self.client.get('/vote_poll_details/?grouped=2')
+        self.assertEqual(response.status_code, 200)
+
+
+if __name__ == '__main__':
     unittest.main()
 
-# RUN WITH: python -m unittest tests/unittest.py
+# RUN WITH: python3 -m unittest tests/test_apis.py
