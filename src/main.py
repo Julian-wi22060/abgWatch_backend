@@ -32,14 +32,15 @@ def create_app():
     return app
 
 
+# Ensure the app can be imported without running the server
+app = create_app()
+
 if __name__ == "__main__":
     """
     Entry point for running the Flask application.
     Starts the application on host `0.0.0.0` and port `50555` with debug mode enabled.
     """
-    app = create_app()
     app.run(host="0.0.0.0", port=50555, debug=True)
-
 
 # ACCESS APIs VIA:
 # V_CANDIDACY_MANDATES API:
