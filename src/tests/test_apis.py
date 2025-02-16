@@ -55,4 +55,4 @@ class BackendTestCase(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-# RUN WITH: python3 -m unittest tests/test_apis.py
+# RUN WITH (in directory 'src'): python3 -m unittest tests/test_apis.py
