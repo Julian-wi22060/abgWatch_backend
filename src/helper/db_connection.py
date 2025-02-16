@@ -4,11 +4,11 @@ import psycopg2
 
 def get_db_connection():
     """
-    Establishes and returns a connection to the PostgreSQL database using environment variables.
+    Establishes and returns a connection to the PostgreSQL database using environment variables
     Returns:
-        psycopg2.extensions.connection: A connection object to the PostgreSQL database.
+        A connection object to the PostgreSQL database
     Raises:
-        psycopg2.OperationalError: If there is an issue with establishing the database connection.
+        psycopg2.OperationalError: If there is an issue with establishing the database connection
     """
     conn = psycopg2.connect(
         host=os.getenv('DB_HOST'),

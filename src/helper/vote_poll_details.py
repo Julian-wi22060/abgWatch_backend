@@ -6,6 +6,7 @@ from datetime import date, datetime
 # Set blueprint for 'VIEW vote_poll_details'
 vote_poll = Blueprint("vote_poll_details", __name__)
 
+
 def custom_json_serializer(obj):
     """
     Custom serializer function for handling non-serializable objects like dates.
@@ -13,6 +14,7 @@ def custom_json_serializer(obj):
     if isinstance(obj, (date, datetime)):
         return obj.isoformat()
     raise TypeError(f"Type {type(obj)} not serializable")
+
 
 @vote_poll.route("/", methods=["GET"])
 def get_vote_poll_details():
@@ -96,6 +98,7 @@ def get_vote_poll_details():
                 rows = [dict(zip(columns, row)) for row in cur.fetchall()]
                 data = {row['vote_id']: row for row in rows}
 
+    # Handle exceptions
     except Exception as e:
         return Response(
             json.dumps({"error": str(e)}, ensure_ascii=False, indent=1, sort_keys=True),
@@ -106,7 +109,7 @@ def get_vote_poll_details():
         if conn is not None:
             conn.close()
 
-    # Use json.dumps with ensure_ascii=False, indent, and sort_keys for formatting
+    # Serialize data using the custom JSON serializer
     return Response(
         json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True, default=custom_json_serializer),
         mimetype="application/json; charset=utf-8"

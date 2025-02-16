@@ -6,6 +6,7 @@ from datetime import date, datetime
 # Set blueprint for 'VIEW v_candidacy_mandates'
 v_cm_bp = Blueprint("v_candidacy_mandates", __name__)
 
+
 def custom_json_serializer(obj):
     """
     Custom serializer function for handling non-serializable objects like dates.
@@ -13,6 +14,7 @@ def custom_json_serializer(obj):
     if isinstance(obj, (date, datetime)):
         return obj.isoformat()
     raise TypeError(f"Type {type(obj)} not serializable")
+
 
 @v_cm_bp.route("/", methods=["GET"])
 def get_v_candidacy_mandates():
@@ -106,6 +108,7 @@ def get_v_candidacy_mandates():
                     row[0]: dict(zip(columns, row)) for row in rows
                 }
 
+    # Handle exceptions
     except Exception as e:
         return Response(
             json.dumps({"error": str(e)}, ensure_ascii=False, indent=1, sort_keys=True),

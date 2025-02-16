@@ -6,12 +6,12 @@ from helper.vote_poll_details import vote_poll
 
 def create_app():
     """
-    Creates and configures the Flask application.
+    Creates and configures the Flask application
     Features:
-        - Registers the blueprints for the API endpoints.
-        - Provides a health check endpoint at `/health`.
+        - Registers the blueprints for the API endpoints
+        - Provides a health check endpoint at `/health`
     Returns:
-        Flask: The configured Flask application instance.
+        Flask: The configured Flask application instance
     """
     app = Flask(__name__)
     CORS(app)
